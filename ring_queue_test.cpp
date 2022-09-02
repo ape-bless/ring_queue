@@ -30,11 +30,15 @@ int main()
     queue_worker.Init((char *)mem_addr, kMemLen, 256);
     sleep(1);
     std::thread t1(PushFunc);
+#ifdef DMULTI_THREAD_PUSH_QUEUE
     std::thread t2(PushFunc);
     std::thread t3(PushFunc);
+#endif
     t1.join();
+#ifdef DMULTI_THREAD_PUSH_QUEUE
     t2.join();
     t3.join();
+#endif
     while(1);
     return 0;
 }

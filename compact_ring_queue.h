@@ -16,6 +16,10 @@
 #include <string.h>
 #include <iostream>
 
+#ifdef MULTI_THREAD_POP_QUEUE
+#include <condition_variable>
+#endif
+
 #define barrier() __asm__ __volatile__("mfence" ::: "memory");
 
 struct CompactQueueHeader {
@@ -109,30 +113,29 @@ struct CompactRingQueue {
 
     E *Pop()
     {
-#ifndef MULTI_THREAD_POP_QUEUE
-        if (!empty()) {
-            E *e = (E *)(buff_ + desc_->head_ % circle_len_);
-            if (e->complete) {
-                uint32_t inc = sizeof(E) + ( (e->len + kAlignofE - 1) / kAlignofE ) * kAlignofE;
-                desc_->head_ += inc;
-                return e;
-            }
-        }
-#else
+        E *e = nullptr;
+#ifdef MULTI_THREAD_POP_QUEUE
         {
             // 对于 buff_ 来说只有一个线程来读, head_ 也只会在这一个线程修改, 可以放弃加锁, 性能提升显著, 对于多写多读的场景需要加锁
             std::unique_lock<std::mutex> lock(buff_mutex_);
-            if ( !pop_condition_.wait_for(lock, std::chrono::milliseconds(200), [this] { return !this->Empty(); }) ) {
+            if ( !pop_condition_.wait_for(lock, std::chrono::milliseconds(200), [this] { return !this->empty(); }) ) {
                 return nullptr;
             }
-            E *e = (NarutoLogEvent *)(buff_ + desc_->head_ % LOG_BUFF_CIRCLE_LEN);
-            uint32_t inc = sizeof(NarutoLogEvent) + ( (e->len + kAlignofEvent - 1) / kAlignofEvent ) * kAlignofEvent;
+            e = (E *)(buff_ + desc_->head_ % circle_len_);
+            uint32_t inc = sizeof(E) + ( (e->len + kAlignofE - 1) / kAlignofE ) * kAlignofE;
             desc_->head_ += inc;
         }
         push_condition_.notify_one();
-        return e;
+#else 
+        if (!empty()) {
+            e = (E *)(buff_ + desc_->head_ % circle_len_);
+            if (e->complete) {
+                uint32_t inc = sizeof(E) + ( (e->len + kAlignofE - 1) / kAlignofE ) * kAlignofE;
+                desc_->head_ += inc;
+            }
+        }
 #endif
-        return nullptr;
+        return e;
     }
 
     int32_t RemoveIncomplete()
