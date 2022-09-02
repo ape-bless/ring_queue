@@ -10,5 +10,5 @@ make
 ## 2.1 多写一读
 make mw=1
 ## 2.1 多写一读
-make mw=1 mr=1
+make mw=1 mr=1  
 最后会生成可执行程序 queue_test，这个程序会将 Push 进队列的内容输出到标准输出，如果需要做其他处理，可以修改 BasalRingQueueWorker::Executor 的逻辑
