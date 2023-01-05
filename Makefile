@@ -1,15 +1,7 @@
-CFLAGS 		+= 	-g -std=c++0x -Wl,-lpthread
+CFLAGS 		+= 	-g -std=c++0x -O2 -Wl,-lpthread
 CXX			= 	g++
 
-ifeq ($(mw), 1)
-	CFLAGS += -DMULTI_THREAD_PUSH_QUEUE
-endif
-
-ifeq ($(mr), 1)
-	CFLAGS += -DMULTI_THREAD_POP_QUEUE
-endif
-
-queue_test:ring_queue_test.cpp
+queue_test:ring_queue_test.cpp compact_ring_queue.h
 	$(CXX) $(CFLAGS) -o queue_test ring_queue_test.cpp
 clean:
 	rm queue_test
