@@ -3,7 +3,7 @@
  * @brief 一个通用队列, 可支持一写一读、一写多读、多写一读、多写多读, 相对于普通的队列, 有两个明显的优点:
  * 1.在支持变长的条件下可以 inplacement new, 减少内存分配、拷贝次数
  * 2."原子" Push, 如果在 Push 过程中, 程序退出, 队列不会乱掉
- * @author kimlonzhang
+ * @author ape-bless
  * @version 1.0.0
  * @date 2022-09-27 22:54
  */
