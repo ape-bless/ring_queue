@@ -5,10 +5,10 @@
 &#8195;&#8195;这个循环队列一写一读、多写一读部分，已经经过了一款百万DAU的线上项目的验证，可以放心使用，多写多读只是在测试环境压测过。
 
 # 2. 使用
-## 2.1 一写一读
+## 2.1 Init
+multi_w 参数控制是否多线程 Push
+multi_r 参数控制是否多线程 Pop
+## 2.2 编译
 make 
-## 2.1 多写一读
-make mw=1
-## 2.1 多写多读
-make mw=1 mr=1  
-最后会生成可执行程序 queue_test，这个程序会将 Push 进队列的内容输出到标准输出，如果需要做其他处理，可以修改 BasalRingQueueWorker::Executor 的逻辑
+## 2.3 测试
+./queue_test push_thread_num pop_thread_num
