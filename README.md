@@ -6,7 +6,7 @@
 
 # 2. 使用
 ## 2.1 Init
-multi_w 参数控制是否多线程 Push
+multi_w 参数控制是否多线程 Push；
 multi_r 参数控制是否多线程 Pop
 ## 2.2 编译
 make 
